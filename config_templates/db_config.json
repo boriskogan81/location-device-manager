@@ -1,0 +1,10 @@
+{
+	"client": "mysql",
+	"connection": {
+		"host": "something",
+		"user": "something",
+		"password": "something",
+		"database": "daimonion-db",
+        "debug": false
+	}
+}

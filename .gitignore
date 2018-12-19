@@ -1,0 +1,19 @@
+node_modules
+
+#package-lock.json
+package-lock.json
+# Logs
+logs
+*.log
+
+# Config
+/config/*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*

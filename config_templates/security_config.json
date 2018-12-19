@@ -1,0 +1,6 @@
+{
+	"jwtSecret": "secret",
+	"saltRounds": 10,
+	"frontgateIps": ["0.0.0.0", "127.0.0.1", "localhost"],
+	"expiration_interval": 1
+}

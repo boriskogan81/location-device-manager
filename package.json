@@ -1,0 +1,48 @@
+{
+  "name": "location-device-manager",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node .app",
+    "debug": "node %NODE_DEBUG_OPTION% .app ",
+    "test": "SET NODE_ENV=test mocha --recursive --timeout 10000 ./test ",
+    "migrate": "knex migrate:latest"
+  },
+  "dependencies": {
+    "bcrypt": "^3.0.2",
+    "bluebird": "latest",
+    "body-parser": "latest",
+    "bookshelf": "^0.13.3",
+    "bookshelf-json-columns": "^2.1.1",
+    "bookshelf-upsert": "^0.2.0",
+    "cookie-parser": "^1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "express-ipfilter": "^0.3.1",
+    "express-validator": "^5.3.0",
+    "http-errors": "~1.6.2",
+    "ioredis": "^4.3.0",
+    "jade": "~1.11.0",
+    "jwt-simple": "^0.5.5",
+    "knex": "^0.15.2",
+    "morgan": "^1.9.1",
+    "mysql": "^2.16.0",
+    "nexmo": "^2.4.0",
+    "nodemon": "^1.18.9",
+    "parse-error": "^0.2.0",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "spdy": "^4.0.0",
+    "sqlite3": "^4.0.4",
+    "uuid4": "^1.1.4",
+    "winston": "^3.1.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+    "sinon": "^6.3.5",
+    "superagent": "^3.8.3",
+    "supertest": "^3.3.0",
+    "winston-spy": "^0.2.0"
+  }
+}
