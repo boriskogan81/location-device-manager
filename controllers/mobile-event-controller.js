@@ -19,23 +19,24 @@ const router = express.Router();
 router.post('/ping', ipFilter(frontGateIps, {mode: 'allow'}), async (req, res) => {
     try {
         const {number} = req.body;
-        await new Number
+        await new Number()
             .where({
                 'number': number
             })
             .upsert({
                 'number': number
             });
+        if (process.env.NODE_ENV)
+            return ReS(res, {result: 'test_success'});
         logger.info(`Ping attempt for number ${number}`);
-        nexmo.message.sendSms(nexmoConfig.from_number, number, "DW");
+        nexmo.message.sendSms('Mirdaf', number, 'DW');
         logger.info(`Ping attempt for number ${number} successful`);
-        return ReS(res, {result: 'success'})
+        return ReS(res, {result: 'success'});
     }
     catch (e) {
         logger.error(`Ping attempt for number ${number} failed with error ${e}`);
         return ReE(res, e, 500);
     }
 });
-
 
 module.exports = router;

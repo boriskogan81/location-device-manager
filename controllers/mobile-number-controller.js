@@ -16,10 +16,10 @@ const nexmo = new Nexmo({
 
 const router = express.Router();
 
-router.post('/inbound-sms', ipFilter(frontGateIps, {mode: 'allow'}), async (req, res) => {
+router.post('/webhooks/inbound-sms', ipFilter(frontGateIps, {mode: 'allow'}), async (req, res) => {
     try {
         logger.info(`Incoming event for number ${req.body.msisdn}: ${JSON.stringify(req.body)}`);
-        await new Event
+        await new Event()
             .save({
                 'details': req.body,
                 'created': new Date(),

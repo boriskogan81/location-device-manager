@@ -22,7 +22,7 @@ exports.up = async function (knex) {
                 .schema
                 .createTable('mobile_event', table => {
                     table.increments('id').primary().unsigned();
-                    table.json('event');
+                    table.json('details');
                     table.dateTime('created');
                     table.integer('mobile_number_id').unsigned().notNullable();
                     table.foreign('mobile_number_id').references('mobile_number.id')

@@ -1,6 +1,6 @@
 'use strict';
 
-const bookshelf = require('../bootstrap/bookshelf_instance');
+const bookshelf = require('../bootstrap/bookshelf_instance').bookshelf;
 const MobileEvent = require('./mobile_event').model;
 
 const MobileNumber = bookshelf.Model.extend({
