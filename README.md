@@ -17,7 +17,7 @@ ability to set up a schedule and an expiration to ping devices).
 
 ##Installation
 ```$xslt
-git clone https://github.com/boriskogan81/location-device-managerr.git
+git clone https://github.com/boriskogan81/location-device-manager.git
 //...change to /location-device-manager directory
 npm install
 
