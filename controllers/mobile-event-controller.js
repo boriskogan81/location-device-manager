@@ -18,7 +18,7 @@ const router = express.Router();
 
 router.post('/ping', ipFilter(frontGateIps, {mode: 'allow'}), async (req, res) => {
     try {
-        const {number} = req.body;
+        const {number, message} = req.body;
         await new Number()
             .where({
                 'number': number
@@ -29,7 +29,7 @@ router.post('/ping', ipFilter(frontGateIps, {mode: 'allow'}), async (req, res) =
         if (process.env.NODE_ENV)
             return ReS(res, {result: 'test_success'});
         logger.info(`Ping attempt for number ${number}`);
-        nexmo.message.sendSms('Mirdaf', number, 'DW');
+        nexmo.message.sendSms(nexmoConfig.from_number, number, message);
         logger.info(`Ping attempt for number ${number} successful`);
         return ReS(res, {result: 'success'});
     }

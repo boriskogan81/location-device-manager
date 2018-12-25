@@ -28,7 +28,7 @@ before(async function (done) {
 });
 
 describe('/POST /api/number/webhooks/inbound-sms', function() {
-    it('should return a 200 response if we pass proper registration credentials',
+    it('should return a 200 response if we post a proper sms',
         function (done){
             request(app)
                 .post('/api/number/webhooks/inbound-sms')
