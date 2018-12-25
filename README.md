@@ -16,7 +16,7 @@ trivial to switch to PostgreSQL or SQLite) to store device identifiers. Tasks ar
 ability to set up a schedule and an expiration to ping devices). 
 
 ## Installation
-Make sure you have Redis and MySQL set up and available. Then:
+Make sure you have MySQL set up and available. Then:
 ```$xslt
 $ git clone https://github.com/boriskogan81/location-device-manager.git
 //...change to /location-device-manager directory
@@ -32,10 +32,10 @@ $ npm start
 ```
 
 ## Usage
-Route registration, login and authentication requests to the appropriate routes, so that your main backend application doesn't need to worry about dealing with these things. 
+Use Location Device Manager as a service to manage location devices, or any other SMS-based device. 
 
 ## Tests
-Daimonion uses in-memory SQLite for testing. The databases interface is the same (Bookshelf/Knex) as for the normal app. Migrations run on every test run, to ensure that the structure of the database is up to date, and when the tests are done running, any stored data/tables disappear.  
+Location Device Manager uses in-memory SQLite for testing. The databases interface is the same (Bookshelf/Knex) as for the normal app. Migrations run on every test run, to ensure that the structure of the database is up to date, and when the tests are done running, any stored data/tables disappear.  
 ```
 $ npm run test
 ```
