@@ -21,7 +21,7 @@ router.post('/webhooks/inbound-sms', ipFilter(frontGateIps, {mode: 'allow'}), as
         logger.info(`Incoming event for number ${req.body.msisdn}: ${JSON.stringify(req.body)}`);
         await new Event()
             .save({
-                'details': req.body,
+                'event': req.body,
                 'created': new Date(),
                 'mobile_number_id': req.body.msisdn
             });

@@ -22,12 +22,9 @@ exports.up = async function (knex) {
                 .schema
                 .createTable('mobile_event', table => {
                     table.increments('id').primary().unsigned();
-                    table.json('details');
+                    table.json('event');
                     table.dateTime('created');
-                    table.integer('mobile_number_id').unsigned().notNullable();
-                    table.foreign('mobile_number_id').references('mobile_number.id')
-                        .onDelete('CASCADE')
-                        .onUpdate('CASCADE');
+                    table.string('mobile_number_id')
                 });
 
         const hasTask = await knex
@@ -42,10 +39,7 @@ exports.up = async function (knex) {
                     table.json('details');
                     table.dateTime('created');
                     table.dateTime('expires');
-                    table.integer('mobile_number_id').unsigned().notNullable();
-                    table.foreign('mobile_number_id').references('mobile_number.id')
-                        .onDelete('CASCADE')
-                        .onUpdate('CASCADE');
+                    table.string('mobile_number_id')
                 });
     }
     catch (e) {
