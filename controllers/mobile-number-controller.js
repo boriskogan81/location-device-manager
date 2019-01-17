@@ -1,22 +1,13 @@
 'use strict';
 
 const express = require('express');
-const Number = require('../models/mobile_number').model;
 const Event = require('../models/mobile_event').model;
-const securityConfig = require('../config/security_config');
-const ipFilter = require('express-ipfilter').IpFilter;
-const frontGateIps = securityConfig.frontgateIps;
+const Task = require('../models/task').model;
 const logger = require('../bootstrap/winston');
-const Nexmo = require('nexmo');
-const nexmoConfig = require('../config/nexmo_config');
-const nexmo = new Nexmo({
-    apiKey: nexmoConfig.api_key,
-    apiSecret: nexmoConfig.api_secret
-});
 
 const router = express.Router();
 
-router.post('/webhooks/inbound-sms', ipFilter(frontGateIps, {mode: 'allow'}), async (req, res) => {
+router.post('/webhooks/inbound-sms', async (req, res) => {
     try {
         logger.info(`Incoming event for number ${req.body.msisdn}: ${JSON.stringify(req.body)}`);
         await new Event()
@@ -25,7 +16,21 @@ router.post('/webhooks/inbound-sms', ipFilter(frontGateIps, {mode: 'allow'}), as
                 'created': new Date(),
                 'mobile_number_id': req.body.msisdn
             });
-        return ReS(res, {result: 'success'})
+
+        const task = await new Task()
+            .where({'mobile_number_id': req.body.msisdn})
+            .fetch();
+
+        if (task && task.serialize() && task.serialize().id) {
+            let taskDetails = task.serialize().details;
+            taskDetails.ping_pending = false;
+            taskDetails.current_pings++;
+            await new Task()
+                .where({'mobile_number_id': req.body.msisdn})
+                .upsert({'details': taskDetails});
+        }
+
+        return ReS(res, {result: 'success'});
     }
     catch (e) {
         logger.error(`Incoming event for number ${req.body.msisdn} failed with error ${e}`);

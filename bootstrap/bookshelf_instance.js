@@ -3,8 +3,8 @@ const env = process.env.NODE_ENV;
 
 let dbConfig;
 
-if(env === 'test')
-    dbConfig = require('../config/db_config')[env];
+if (env === 'test')
+    dbConfig = require('../config/db_config')['test'];
 else
     dbConfig = require('../config/db_config')['production'];
 

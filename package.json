@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node .app",
+    "start": "node ./app",
     "debug": "node %NODE_DEBUG_OPTION% .app ",
     "test": "SET NODE_ENV=test mocha --recursive --timeout 10000 ./test ",
     "migrate": "knex migrate:latest"
