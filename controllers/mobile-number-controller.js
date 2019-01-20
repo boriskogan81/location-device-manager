@@ -24,7 +24,6 @@ router.post('/webhooks/inbound-sms', async (req, res) => {
         if (task && task.serialize() && task.serialize().id) {
             let taskDetails = task.serialize().details;
             taskDetails.ping_pending = false;
-            taskDetails.current_pings++;
             await new Task()
                 .where({'mobile_number_id': req.body.msisdn})
                 .upsert({'details': taskDetails});

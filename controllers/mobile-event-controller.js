@@ -16,7 +16,7 @@ const nexmo = new Nexmo({
 
 const router = express.Router();
 
-router.post('/ping', ipFilter(frontGateIps, {mode: 'allow'}), async (req, res) => {
+router.post('/ping',  async (req, res) => {
     try {
         const {number, message} = req.body;
         await new Number()
@@ -26,8 +26,6 @@ router.post('/ping', ipFilter(frontGateIps, {mode: 'allow'}), async (req, res) =
             .upsert({
                 'number': number
             });
-        if (process.env.NODE_ENV)
-            return ReS(res, {result: 'test_success'});
         logger.info(`Ping attempt for number ${number}`);
         nexmo.message.sendSms(nexmoConfig.from_number, number, message);
         logger.info(`Ping attempt for number ${number} successful`);
@@ -39,7 +37,7 @@ router.post('/ping', ipFilter(frontGateIps, {mode: 'allow'}), async (req, res) =
     }
 });
 
-router.post('/task', ipFilter(frontGateIps, {mode: 'allow'}), async (req, res) => {
+router.post('/task', async (req, res) => {
     try {
         const {number, message, frequency_minutes, duration_hours, max_pings} = req.body;
         if (!(number && message && parseInt(frequency_minutes) && parseInt(duration_hours) && parseInt(max_pings)))
@@ -54,9 +52,9 @@ router.post('/task', ipFilter(frontGateIps, {mode: 'allow'}), async (req, res) =
             });
 
         const created = new Date();
-        const expires = new Date().setHours(new Date().getHours() + parseInt(duration_hours));
+        const expires = new Date(new Date().setHours(new Date().getHours() + parseInt(duration_hours)));
 
-        const task = new Task()
+        await new Task()
             .where({'mobile_number_id': number})
             .upsert({
                 'details': {
@@ -67,48 +65,51 @@ router.post('/task', ipFilter(frontGateIps, {mode: 'allow'}), async (req, res) =
                 'mobile_number_id': number
             });
 
+        const task = await new Task()
+            .where({'mobile_number_id': number})
+            .fetch();
         const taskId = task.serialize().id;
 
-        const interval = setInterval(function () {pingNumber(number, message, taskId, interval).then(() => {return;});}, frequency_minutes * 1000 * 60);
-        return ReS(res, {result: 'success'});
+        (async function pingNumber(){
+            const fetchedTask = await new Task()
+                .where({'id': taskId})
+                .fetch();
+
+            const task = fetchedTask.serialize();
+            let taskDetails = task.details;
+
+            if (taskDetails.ping_pending) {
+                logger.info('Last ping for task is still pending, will not ping until the next interval', task);
+                setTimeout(pingNumber, frequency_minutes * 1000 * 60);
+                return;
+            }
+
+            if (taskDetails.current_pings >= taskDetails.max_pings) {
+                logger.info('Max pings reached, clearing task interval', task);
+                return;
+            }
+
+            const now = new Date();
+            const expires = new Date(task.expires);
+            if (now > expires) {
+                logger.info('Task is expired,', task);
+                return;
+            }
+
+            nexmo.message.sendSms(nexmoConfig.from_number, number, message);
+            taskDetails.ping_pending = true;
+            taskDetails.current_pings++;
+            await new Task()
+                .where({'id': taskId})
+                .upsert({'details': taskDetails});
+            setTimeout(pingNumber, frequency_minutes * 1000 * 60);
+        })();
+        ReS(res, {result: 'success'});
     }
     catch (e) {
-        logger.error(`Ping attempt for number ${number} failed with error ${e}`);
+        logger.error(`Task attempt failed with error ${e}`, {body: req.body});
         return ReE(res, e, 500);
     }
 });
-
-const pingNumber = async (number, message, taskId, interval) => {
-    const fetchedTask = await new Task()
-        .where({'id': taskId})
-        .fetch();
-
-    const task = fetchedTask.serialize();
-    let taskDetails = task.details;
-
-    if (taskDetails.ping_pending) {
-        logger.info('Last ping for task is still pending, will not ping until the next interval', task);
-        return;
-    }
-
-    if (taskDetails.current_pings >= taskDetails.max_pings) {
-        logger.info('Max pings reached, clearing task interval', task);
-        clearInterval(interval);
-        return;
-    }
-
-    const now = new Date();
-    const expires = new Date(task.expires);
-    if (now > expires) {
-        logger.info('Task is expired,', task);
-        clearInterval(interval);
-    }
-
-    nexmo.message.sendSms(nexmoConfig.from_number, number, message);
-    taskDetails.ping_pending = true;
-    await new Task()
-        .where({'id': taskId})
-        .upsert({'details': taskDetails});
-};
 
 module.exports = router;
