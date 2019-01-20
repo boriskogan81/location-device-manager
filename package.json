@@ -9,6 +9,7 @@
     "migrate": "knex migrate:latest"
   },
   "dependencies": {
+    "@google-cloud/logging-winston": "^0.10.2",
     "bcrypt": "^3.0.2",
     "bluebird": "latest",
     "body-parser": "latest",
