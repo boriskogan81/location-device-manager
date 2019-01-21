@@ -1,2 +1,4 @@
 runtime: nodejs
 env: flex
+beta_settings:
+  cloud_sql_instances: crested-return-227514:europe-north1:daimonion

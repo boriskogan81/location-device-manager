@@ -2,11 +2,10 @@
 
 const express = require('express');
 const Number = require('../models/mobile_number').model;
+const Event = require('../models/mobile_event').model;
 const Task = require('../models/task').model;
-const securityConfig = require('../config/security_config');
-const ipFilter = require('express-ipfilter').IpFilter;
-const frontGateIps = securityConfig.frontgateIps;
 const logger = require('../bootstrap/winston');
+const moment = require('moment');
 const Nexmo = require('nexmo');
 const nexmoConfig = require('../config/nexmo_config');
 const nexmo = new Nexmo({
@@ -112,4 +111,28 @@ router.post('/task', async (req, res) => {
     }
 });
 
+router.get('/events',  async (req, res) => {
+    try {
+        logger.info(`Events get attempt with params`, {params: req.params});
+        let {number, from, to} = req.params;
+        if(!from || !moment(new Date(from)))
+            from = new Date();
+        if(!to || !moment(new Date(to)))
+            to = moment().subtract(1, 'w').toDate();
+
+        const events = await new Event()
+            .query((qb) => {
+                qb
+                    .whereBetween('created', [from, to])
+                    .andWhere({'mobile_number_id': number});
+            })
+            .fetch();
+        logger.info(`Events get attempt successful`, {events});
+        return ReS(res, {events}, 200);
+    }
+    catch (e) {
+        logger.error(`Events get attempt failed with error ${e}`);
+        return ReE(res, e, 500);
+    }
+});
 module.exports = router;

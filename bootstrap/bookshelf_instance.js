@@ -8,6 +8,9 @@ if (env === 'test')
 else
     dbConfig = require('../config/db_config')['production'];
 
+if (process.env.INSTANCE_CONNECTION_NAME && process.env.NODE_ENV === 'production') {
+    dbConfig.socketPath = `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`;
+}
 const knex = require('knex')(dbConfig);
 const jsonColumns = require('bookshelf-json-columns');
 const upsert = require('bookshelf-upsert');
