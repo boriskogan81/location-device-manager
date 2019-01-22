@@ -15,7 +15,7 @@ const nexmo = new Nexmo({
 
 const router = express.Router();
 
-router.post('/ping',  async (req, res) => {
+router.post('/ping', async (req, res) => {
     try {
         const {number, message} = req.body;
         await new Number()
@@ -29,8 +29,7 @@ router.post('/ping',  async (req, res) => {
         nexmo.message.sendSms(nexmoConfig.from_number, number, message);
         logger.info(`Ping attempt for number ${number} successful`);
         return ReS(res, {result: 'success'});
-    }
-    catch (e) {
+    } catch (e) {
         logger.error(`Ping attempt for number ${number} failed with error ${e}`);
         return ReE(res, e, 500);
     }
@@ -69,7 +68,7 @@ router.post('/task', async (req, res) => {
             .fetch();
         const taskId = task.serialize().id;
 
-        (async function pingNumber(){
+        (async function pingNumber () {
             const fetchedTask = await new Task()
                 .where({'id': taskId})
                 .fetch();
@@ -104,33 +103,35 @@ router.post('/task', async (req, res) => {
             setTimeout(pingNumber, frequency_minutes * 1000 * 60);
         })();
         ReS(res, {result: 'success'});
-    }
-    catch (e) {
+    } catch (e) {
         logger.error(`Task attempt failed with error ${e}`, {body: req.body});
         return ReE(res, e, 500);
     }
 });
 
-router.get('/events',  async (req, res) => {
+router.get('/events', async (req, res) => {
     try {
-        logger.info(`Events get attempt with params`, {params: req.params});
-        let {number, from, to} = req.params;
-        if(!from || !moment(new Date(from)))
-            from = new Date();
-        if(!to || !moment(new Date(to)))
-            to = moment().subtract(1, 'w').toDate();
+        logger.info(`Events get attempt with params`, {params: req.param});
+        let {number, from, to} = req.query;
+        (!from || !moment(from))?
+            from = moment().subtract(1, 'w'):
+            from = moment(from);
+        (!to || !moment(to))?
+            to = moment():
+            to = moment(to);
 
+        from = from.format("YYYY-MM-DD HH:mm:ss");
+        to = to.format("YYYY-MM-DD HH:mm:ss");
         const events = await new Event()
             .query((qb) => {
                 qb
                     .whereBetween('created', [from, to])
                     .andWhere({'mobile_number_id': number});
             })
-            .fetch();
+            .fetchAll();
         logger.info(`Events get attempt successful`, {events});
         return ReS(res, {events}, 200);
-    }
-    catch (e) {
+    } catch (e) {
         logger.error(`Events get attempt failed with error ${e}`);
         return ReE(res, e, 500);
     }
