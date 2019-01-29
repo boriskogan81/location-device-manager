@@ -34,6 +34,7 @@
     "parse-error": "^0.2.0",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
+    "request-promise-native": "^1.0.5",
     "spdy": "^4.0.0",
     "sqlite3": "^4.0.4",
     "uuid4": "^1.1.4",

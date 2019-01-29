@@ -5,8 +5,18 @@ let dbConfig;
 
 if (env === 'test')
     dbConfig = require('../config/db_config')['test'];
-else
+else{
     dbConfig = require('../config/db_config')['production'];
+    if(process.env.SQL_USER)
+        dbConfig.user = process.env.SQL_USER;
+    if(process.env.SQL_DATABASE)
+        dbConfig.database = process.env.SQL_DATABASE;
+    if(process.env.SQL_PASSWORD)
+        dbConfig.password = process.env.SQL_PASSWORD;
+    if (process.env.INSTANCE_CONNECTION_NAME && process.env.NODE_ENV === 'production')
+        dbConfig.socketPath = `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`;
+}
+
 
 if (process.env.INSTANCE_CONNECTION_NAME && process.env.NODE_ENV === 'production') {
     dbConfig.socketPath = `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`;

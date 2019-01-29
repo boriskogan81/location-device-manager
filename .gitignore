@@ -17,3 +17,6 @@ logs
 *.njsproj
 *.sln
 *.sw*
+
+#App.yaml
+app.yaml

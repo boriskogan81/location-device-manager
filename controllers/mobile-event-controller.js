@@ -8,6 +8,7 @@ const logger = require('../bootstrap/winston');
 const moment = require('moment');
 const Nexmo = require('nexmo');
 const nexmoConfig = require('../config/nexmo_config');
+
 const nexmo = new Nexmo({
     apiKey: nexmoConfig.api_key,
     apiSecret: nexmoConfig.api_secret
@@ -35,9 +36,28 @@ router.post('/ping', async (req, res) => {
     }
 });
 
+router.post('/stop_tasks', async (req, res) => {
+    try {
+        let {numbers} = req.body;
+
+        for(let number of numbers){
+            await new Task()
+                .where({'mobile_number_id': number})
+                .upsert({
+                    expires: new Date()
+                });
+        }
+
+        ReS(res, {result: 'success'});
+    } catch (e) {
+        logger.error(`Task attempt failed with error ${e}`, {body: req.body});
+        return ReE(res, e, 500);
+    }
+});
+
 router.post('/task', async (req, res) => {
     try {
-        const {number, message, frequency_minutes, duration_hours, max_pings} = req.body;
+        let {number, message, frequency_minutes, duration_hours, max_pings} = req.body;
         if (!(number && message && parseInt(frequency_minutes) && parseInt(duration_hours) && parseInt(max_pings)))
             return ReE(res, 'Could not create task, malformed request', 422);
 
@@ -50,6 +70,10 @@ router.post('/task', async (req, res) => {
             });
 
         const created = new Date();
+        if(parseInt(duration_hours) > 12)
+            duration_hours = 12;
+
+
         const expires = new Date(new Date().setHours(new Date().getHours() + parseInt(duration_hours)));
 
         await new Task()
